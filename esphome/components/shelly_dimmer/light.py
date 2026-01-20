@@ -44,6 +44,8 @@ CONF_UPDATE = "update"
 CONF_LEADING_EDGE = "leading_edge"
 CONF_WARMUP_BRIGHTNESS = "warmup_brightness"
 # CONF_WARMUP_TIME = "warmup_time"
+CONF_KICK_THRESHOLD = "kick_threshold"
+CONF_KICK_DURATION = "kick_duration"
 
 
 CONF_NRST_PIN = "nrst_pin"
@@ -157,6 +159,10 @@ CONFIG_SCHEMA = (
             cv.Optional(CONF_LEADING_EDGE, default=False): cv.boolean,
             cv.Optional(CONF_WARMUP_BRIGHTNESS, default=100): cv.uint16_t,
             # cv.Optional(CONF_WARMUP_TIME, default=20): cv.uint16_t,
+            cv.Optional(CONF_KICK_THRESHOLD, default="10%"): cv.percentage,
+            cv.Optional(
+                CONF_KICK_DURATION, default="50ms"
+            ): cv.positive_time_period_milliseconds,
             cv.Optional(CONF_MIN_BRIGHTNESS, default=0): cv.uint16_t,
             cv.Optional(CONF_MAX_BRIGHTNESS, default=1000): cv.uint16_t,
             cv.Optional(CONF_POWER): sensor.sensor_schema(
@@ -209,6 +215,9 @@ async def to_code(config):
     cg.add(var.set_leading_edge(config[CONF_LEADING_EDGE]))
     cg.add(var.set_warmup_brightness(config[CONF_WARMUP_BRIGHTNESS]))
     # cg.add(var.set_warmup_time(config[CONF_WARMUP_TIME]))
+    kick_threshold = int(round(config[CONF_KICK_THRESHOLD] * 1000))
+    cg.add(var.set_kick_threshold(kick_threshold))
+    cg.add(var.set_kick_duration(config[CONF_KICK_DURATION].total_milliseconds))
     cg.add(var.set_min_brightness(config[CONF_MIN_BRIGHTNESS]))
     cg.add(var.set_max_brightness(config[CONF_MAX_BRIGHTNESS]))
 

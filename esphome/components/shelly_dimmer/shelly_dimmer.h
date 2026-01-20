@@ -16,6 +16,9 @@ namespace shelly_dimmer {
 class ShellyDimmer : public PollingComponent, public light::LightOutput, public uart::UARTDevice {
  private:
   static constexpr uint16_t SHELLY_DIMMER_BUFFER_SIZE = 256;
+  static constexpr uint16_t SHELLY_DIMMER_MAX_BRIGHTNESS = 1000;
+  uint16_t kick_threshold_{100};
+  uint32_t kick_duration_{50};
 
  public:
   float get_setup_priority() const override { return setup_priority::LATE; }
@@ -44,6 +47,8 @@ class ShellyDimmer : public PollingComponent, public light::LightOutput, public 
   void set_fade_rate(uint16_t fade_rate) { this->fade_rate_ = fade_rate; }
   void set_min_brightness(uint16_t min_brightness) { this->min_brightness_ = min_brightness; }
   void set_max_brightness(uint16_t max_brightness) { this->max_brightness_ = max_brightness; }
+  void set_kick_threshold(uint16_t kick_threshold) { this->kick_threshold_ = kick_threshold; }
+  void set_kick_duration(uint32_t kick_duration) { this->kick_duration_ = kick_duration; }
 
   void set_power_sensor(sensor::Sensor *power_sensor) { this->power_sensor_ = power_sensor; }
   void set_voltage_sensor(sensor::Sensor *voltage_sensor) { this->voltage_sensor_ = voltage_sensor; }
