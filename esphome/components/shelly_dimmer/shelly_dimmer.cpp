@@ -149,6 +149,17 @@ void ShellyDimmer::write_state(light::LightState *state) {
   }
   ESP_LOGD(TAG, "Brightness update: %d (raw: %f)", brightness_int, brightness);
 
+  const bool needs_kick =
+      this->brightness_ == 0 && brightness_int > 0 && brightness_int < this->kick_threshold_;
+  if (needs_kick) {
+    ESP_LOGD(TAG, "Warm-up kick: boosting brightness to %d for %u ms", SHELLY_DIMMER_MAX_BRIGHTNESS,
+             this->kick_duration_);
+    this->send_brightness_(SHELLY_DIMMER_MAX_BRIGHTNESS);
+    this->set_timeout("warmup_kick", this->kick_duration_,
+                      [this, brightness_int]() { this->send_brightness_(brightness_int); });
+    return;
+  }
+
   this->send_brightness_(brightness_int);
 }
 #ifdef USE_SHD_FIRMWARE_DATA
